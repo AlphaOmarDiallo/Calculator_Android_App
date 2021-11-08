@@ -10,31 +10,12 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText mETResult;
-    private EditText mETNewNumber;
-    private TextView mTVOperation;
+    private EditText result;
+    private EditText newNumber;
+    private TextView displayOperation;
 
-    private Button mBtn0;
-    private Button mBtn1;
-    private Button mBtn2;
-    private Button mBtn3;
-    private Button mBtn4;
-    private Button mBtn5;
-    private Button mBtn6;
-    private Button mBtn7;
-    private Button mBtn8;
-    private Button mBtn9;
-    private Button mBtnDot;
-
-    private Button mBtnDivide;
-    private Button mBtnMultiply;
-    private Button mBtnPlus;
-    private Button mBtnMinus;
-    private Button mBtnEqual;
-
-    // Private variable to hold operand and calculation type
+    // Variables to hold the operands and type of calculations
     private Double operand1 = null;
-    private Double operand2 = null;
     private String pendingOperation = "=";
 
     @Override
@@ -42,68 +23,101 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mETResult = findViewById(R.id.editTextNumberSignedResult);
-        mETNewNumber = findViewById(R.id.editTextNumberSignedNewNumber);
-        mTVOperation = findViewById(R.id.textViewOperation);
-        mBtn0 = findViewById(R.id.button0);
-        mBtn1 = findViewById(R.id.button1);
-        mBtn2 = findViewById(R.id.button2);
-        mBtn3 = findViewById(R.id.button3);
-        mBtn4 = findViewById(R.id.button4);
-        mBtn5 = findViewById(R.id.button5);
-        mBtn6 = findViewById(R.id.button6);
-        mBtn7 = findViewById(R.id.button7);
-        mBtn8 = findViewById(R.id.button8);
-        mBtn9 = findViewById(R.id.button9);
-        mBtnDivide = findViewById(R.id.buttonDivide);
-        mBtnMultiply = findViewById(R.id.buttonMultiply);
-        mBtnPlus = findViewById(R.id.buttonAddition);
-        mBtnMinus = findViewById(R.id.buttonSubtract);
-        mBtnDot = findViewById(R.id.buttonDot);
-        mBtnEqual = findViewById(R.id.buttonEquals);
+        result = (EditText) findViewById(R.id.editTextNumberSignedResult);
+        newNumber = (EditText) findViewById(R.id.editTextNumberSignedNewNumber);
+        displayOperation = (TextView) findViewById(R.id.textViewOperation);
 
-// Setting up listener for digits
-        View.OnClickListener listenerDigits = new View.OnClickListener() {
+        Button button0 = (Button) findViewById(R.id.button0);
+        Button button1 = (Button) findViewById(R.id.button1);
+        Button button2 = (Button) findViewById(R.id.button2);
+        Button button3 = (Button) findViewById(R.id.button3);
+        Button button4 = (Button) findViewById(R.id.button4);
+        Button button5 = (Button) findViewById(R.id.button5);
+        Button button6 = (Button) findViewById(R.id.button6);
+        Button button7 = (Button) findViewById(R.id.button7);
+        Button button8 = (Button) findViewById(R.id.button8);
+        Button button9 = (Button) findViewById(R.id.button9);
+        Button buttonDot = (Button) findViewById(R.id.buttonDot);
+
+        Button buttonEquals = (Button) findViewById(R.id.buttonEquals);
+        Button buttonDivide = (Button) findViewById(R.id.buttonDivide);
+        Button buttonMultiply = (Button) findViewById(R.id.buttonMultiply);
+        Button buttonMinus = (Button) findViewById(R.id.buttonSubtract);
+        Button buttonPlus = (Button) findViewById(R.id.buttonAddition);
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Button b = (Button) view;
-                mETNewNumber.append(b.getText().toString());
+                newNumber.append(b.getText().toString());
             }
         };
+        button0.setOnClickListener(listener);
+        button1.setOnClickListener(listener);
+        button2.setOnClickListener(listener);
+        button3.setOnClickListener(listener);
+        button4.setOnClickListener(listener);
+        button5.setOnClickListener(listener);
+        button6.setOnClickListener(listener);
+        button7.setOnClickListener(listener);
+        button8.setOnClickListener(listener);
+        button9.setOnClickListener(listener);
+        buttonDot.setOnClickListener(listener);
 
-        mBtn0.setOnClickListener(listenerDigits);
-        mBtn1.setOnClickListener(listenerDigits);
-        mBtn2.setOnClickListener(listenerDigits);
-        mBtn3.setOnClickListener(listenerDigits);
-        mBtn4.setOnClickListener(listenerDigits);
-        mBtn5.setOnClickListener(listenerDigits);
-        mBtn6.setOnClickListener(listenerDigits);
-        mBtn7.setOnClickListener(listenerDigits);
-        mBtn8.setOnClickListener(listenerDigits);
-        mBtn9.setOnClickListener(listenerDigits);
-        mBtnDot.setOnClickListener(listenerDigits);
-
-// Setting up listeners for operations
-        View.OnClickListener listenerOperation = new View.OnClickListener() {
+        View.OnClickListener opListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Button b = (Button) view;
                 String op = b.getText().toString();
-                String value = mETNewNumber.getText().toString();
-                if (value.length() != 0) {
-                    performOperation(value, op);
+                String value = newNumber.getText().toString();
+                try {
+                    Double doubleValue = Double.valueOf(value);
+                    performOperation(doubleValue, op);
+                } catch (NumberFormatException exception) {
+                    newNumber.setText("");
                 }
                 pendingOperation = op;
-                mTVOperation.setText(pendingOperation);
+                displayOperation.setText(pendingOperation);
             }
         };
-        mBtnDivide.setOnClickListener(listenerOperation);
-        mBtnMultiply.setOnClickListener(listenerOperation);
-        mBtnMinus.setOnClickListener(listenerOperation);
-        mBtnPlus.setOnClickListener(listenerOperation);
-        mBtnEqual.setOnClickListener(listenerOperation);
+
+        buttonEquals.setOnClickListener(opListener);
+        buttonDivide.setOnClickListener(opListener);
+        buttonMultiply.setOnClickListener(opListener);
+        buttonMinus.setOnClickListener(opListener);
+        buttonPlus.setOnClickListener(opListener);
     }
-    private void performOperation (String value, String operation) {
-        mTVOperation.setText(operation);
+
+    private void performOperation(Double value, String operation) {
+        if (null == operand1) {
+            operand1 = value;
+        } else {
+
+            if (pendingOperation.equals("=")) {
+                pendingOperation = operation;
+            }
+            switch (pendingOperation) {
+                case "=":
+                    operand1 = value;
+                    break;
+                case "/":
+                    if (value == 0) {
+                        operand1 = 0.0;
+                    } else {
+                        operand1 /= value;
+                    }
+                    break;
+                case "*":
+                    operand1 *= value;
+                    break;
+                case "-":
+                    operand1 -= value;
+                    break;
+                case "+":
+                    operand1 += value;
+                    break;
+            }
+        }
+        result.setText(operand1.toString());
+        newNumber.setText("");
     }
 }
