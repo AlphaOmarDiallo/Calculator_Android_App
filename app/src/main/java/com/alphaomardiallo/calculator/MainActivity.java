@@ -1,5 +1,6 @@
 package com.alphaomardiallo.calculator;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -13,6 +14,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText result;
     private EditText newNumber;
     private TextView displayOperation;
+    private static final String STATE_PENDING_OPERATION = "PendingOperation";
+    private static final String STATE_OPERAND1 = "Operand1";
 
     // Variables to hold the operands and type of calculations
     private Double operand1 = null;
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonMultiply = (Button) findViewById(R.id.buttonMultiply);
         Button buttonMinus = (Button) findViewById(R.id.buttonSubtract);
         Button buttonPlus = (Button) findViewById(R.id.buttonAddition);
+
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,6 +89,54 @@ public class MainActivity extends AppCompatActivity {
         buttonMultiply.setOnClickListener(opListener);
         buttonMinus.setOnClickListener(opListener);
         buttonPlus.setOnClickListener(opListener);
+
+        Button buttonNeg = (Button) findViewById(R.id.buttonNeg);
+        buttonNeg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String value = newNumber.getText().toString();
+                if (value.length() == 0) {
+                    newNumber.setText("-");
+                } else {
+                    try {
+                        Double doubleValue = Double.valueOf(value);
+                        doubleValue *= -1;
+                        newNumber.setText(doubleValue.toString());
+                    } catch (NumberFormatException e) {
+                        newNumber.setText("");
+                    }
+                }
+            }
+        });
+
+        Button buttonClear = (Button) findViewById(R.id.buttonClear);
+        buttonClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                result.setText("");
+                newNumber.setText("");
+                displayOperation.setText("");
+                operand1 = null;
+                pendingOperation = "=";
+            }
+        });
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        pendingOperation = savedInstanceState.getString(STATE_PENDING_OPERATION);
+        operand1 = savedInstanceState.getDouble(STATE_OPERAND1);
+        displayOperation.setText(pendingOperation);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putString(STATE_PENDING_OPERATION, result.getText().toString());
+        if (operand1 != null){
+            outState.putDouble(STATE_OPERAND1, operand1);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     private void performOperation(Double value, String operation) {
